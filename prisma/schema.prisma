@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+ 
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String      @id @default(cuid())
+  userId    String   @unique
+  name      String
+  username  String   @unique
+  email     String   @unique
+  password  String?
+  content   String?
+  clerkId     String @unique
+  img     String?
+ 
+
+  products  Product[]
+  carts     Cart[]
+  orders   Order[]
+
+}
+
+
+
+model Product {
+  id          String     @id @default(cuid())
+  productId   String   @unique @default(cuid())
+  name        String
+  description String
+  price       Float
+  image       String?
+  stock       Int
+
+  authorId      String 
+  author        User     @relation(fields: [authorId], references: [id])
+  carts       Cart[]
+  createdAt   DateTime @default(now())
+  orders      Order[]
+  productImages ProductImage[]
+  productSizes ProductSize[]
+  productColors ProductColor[]
+}
+
+model Cart {
+  id          String   @id @default(cuid())
+  cartId      String   @unique
+  quantity    Int
+  totalPrice  Float
+
+  authorId    String
+  authors     User     @relation(fields: [authorId], references: [id])
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  @@index([authorId, productId])
+}
+
+model Order {
+  id          String   @id @default(cuid())
+  orderId     String   @unique
+  quantity    Int
+  totalPrice  Float
+
+  authorId    String
+  authors     User     @relation(fields: [authorId], references: [id])
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  @@index([authorId, productId])
+}
+
+model ProductSize {
+  id          String   @id @default(cuid())
+  size        String
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductColor {
+  id          String   @id @default(cuid())
+  color       String
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  url       String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+}
