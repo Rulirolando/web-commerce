@@ -46,10 +46,15 @@ CLERK_SECRET_KEY=
 DATABASE_URL=
 ```
 ###🧪 Database Setup (Prisma)
+
+```env
 npx prisma generate
 npx prisma migrate dev
+```
 
 ### ▶️ Run the Project
+
+```env
 npm install
 npm run dev
-
+```
